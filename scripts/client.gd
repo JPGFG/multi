@@ -1,6 +1,7 @@
 class_name Client
 extends Node
 
+var demo: bool = true
 
 const PORT: int = 42069
 const HOST: String = "127.0.0.1"
