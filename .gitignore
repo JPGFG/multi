@@ -1,0 +1,53 @@
+# --- OS-specific ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# --- General Editor Caches ---
+*.swp
+*.swo
+*.tmp
+*.log
+*.bak
+*.backup
+*.orig
+
+# --- IDE Folders ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Godot Specific ---
+.godot/
+.import/              # Auto-generated import files
+.export/              # Export logs & data
+export.cfg            # Local export settings
+export_presets.cfg    # Export presets (can be regenerated)
+*.translation         # Generated translation files
+*.import              # Metadata files for assets
+
+# --- Build Artifacts ---
+*.exe
+*.apk
+*.zip
+*.tar.gz
+*.7z
+*.rar
+
+# --- Misc ---
+*.lock
+*.pid
+
+############################################################
+#                          _^_                             #
+#                        ( o o )                           #
+#                        /  -  \                           #
+#                     .-'  | |  `-.                        #
+#                    (     | |     )                       #
+#                     `-.  | |  .-'                        #
+#                        `-^ ^-'                           #
+#                                                          #
+#                                                          #
+#                   COLUMBIA UNIVERSITY                    #
+############################################################
