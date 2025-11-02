@@ -4,7 +4,7 @@ For more information on progress navigate to the docs folder, where logs are sav
 
 Explicit goals from outset:
 
-- Allow up to 4 players to connect to a **HEADLESS** server.
+- Allow up to 4 players to connect to a **HEADLESS** server. COMPLETE 2NOV25
 - Spawn zombies on server side.
 - Register hits and damage to zombies, shared across all clients.
 - Procedurally Generated Map.
