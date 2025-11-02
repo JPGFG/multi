@@ -1,4 +1,4 @@
-class_name NetHandler
+
 extends Node
 
 # ===================
@@ -112,6 +112,9 @@ func _on_peer_connected(id: int) -> void:
 	
 	print("Net: peer joined: ", id)
 	
+	for existing_id in server_players.keys():
+		var data := {"pos": server_players[existing_id]["pos"]}
+		rpc_id(id, "s2c_player_join", existing_id, data)
 	# Tell all clients that someone joined - made reliable for clients to spawn proxies during load-in
 	
 	rpc("s2c_player_join", id, {"pos": server_players[id]["pos"]})
@@ -164,7 +167,7 @@ func _physics_process(delta: float) -> void:
 		var dir: Vector2 = p["input"]
 		if dir.length() > 1.0:
 			dir = dir.normalized()
-		p["pos"] += dir * 200 * delta #TODO fix this and make it into a serializable movespeed, possiblity for buffs etc.
+		p["pos"] += dir * 400 * delta #TODO fix this and make it into a serializable movespeed, possiblity for buffs etc.
 		server_players[id] = p
 	
 	_accum += delta

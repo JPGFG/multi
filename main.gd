@@ -2,47 +2,58 @@
 extends Node2D
 
 var player_scene = preload("res://scenes/player.tscn")
-
-var is_server: bool = false
-var server: Server
-var client: Client
+var player_nodes: Dictionary = {} # peer_id -> Node2D
 
 func _ready() -> void:
-	var args = OS.get_cmdline_user_args()
-	if "--server" in args:
-		print("Starting in SERVER mode")
-		is_server = true
-		var net_server_scene = load("res://scenes/server.tscn")
-		server = net_server_scene.instantiate()
-		add_child(server)
-	else:
-		print("Staring in CLIENT mode")
-		is_server = false
-		client = Client.new() as Node
-		add_child(client)
-		
-		var player = player_scene.instantiate()
-		player.position = Vector2.ZERO
-		add_child(player)
-		
-		client.register_local_player(player)
+	# listen to network events
+	JPNet.snapshot_received.connect(_on_snapshot)
+	JPNet.peer_joined.connect(_on_peer_joined)
+	JPNet.peer_left.connect(_on_peer_left)
+	
+	# if we're a client and already connected, spawn self
 
+func _spawn_local_player() -> void:
+	var p = player_scene.instantiate()
+	add_child(p)
+	# local player's node is managed by the player script itself
+	# remote players will be spawned in _on_peer_joined
 
-# Shared RPCs
-
-# CLIENT -> SERVER
-@rpc("any_peer", "unreliable")
-func c2s_input(dir: Vector2) -> void:
-	if not is_server:
+func _on_peer_joined(peer_id: int, data: Dictionary) -> void:
+	if player_nodes.has(peer_id):
 		return
-	# we are on the server here
-	var from_id = multiplayer.get_remote_sender_id()
-	server.handle_client_input(from_id, dir)
+	
+	var p := player_scene.instantiate()
+	p.name = "Player_%s" % peer_id
+	if data.has("pos"):
+		p.global_position = data["pos"]
+	add_child(p)
+	player_nodes[peer_id] = p
+	
+	if peer_id == multiplayer.get_unique_id():
+		# eg add child camera etc TODO
+		pass
 
-#SERVER -> CLIENTS
-@rpc("unreliable")
-func s2c_state(state: Dictionary) -> void:
-	if is_server:
-		return
-	# client only code
-	client.apply_state(state)
+func _on_peer_left(peer_id: int) -> void:
+	if player_nodes.has(peer_id):
+		player_nodes[peer_id].queue_free()
+		player_nodes.erase(peer_id)
+
+
+func _on_snapshot(state: Dictionary) -> void:
+	var players: Dictionary = state.get("players", {})
+	for peer_id in players.keys():
+		var pos: Vector2 = players[peer_id]
+		
+		if not player_nodes.has(peer_id):
+			# late join case: spawn
+			var p:= player_scene.instantiate()
+			p.name = "Player_%s" % peer_id
+			add_child(p)
+			player_nodes[peer_id] = p
+		
+		var node: Node2D = player_nodes[peer_id]
+		# simple smoothing
+		if peer_id == multiplayer.get_unique_id():
+			node.global_position = node.global_position.lerp(pos, 0.8)
+		else:
+			node.global_position = node.global_position.lerp(pos, 0.8)
