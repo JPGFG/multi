@@ -1,4 +1,4 @@
-class_name Net
+class_name NetHandler
 extends Node
 
 # ===================
