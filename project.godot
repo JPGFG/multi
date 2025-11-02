@@ -15,6 +15,10 @@ run/main_scene="uid://dlrstj4tlpail"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+JPNet="*res://scripts/autoload/jp_net.gd"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
