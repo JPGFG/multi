@@ -4,13 +4,14 @@ extends Node2D
 var player_scene = preload("res://scenes/player.tscn")
 var player_nodes: Dictionary = {} # peer_id -> Node2D
 
+@onready var tilemap = $TileMapLayer
+
 func _ready() -> void:
 	# listen to network events
 	JPNet.snapshot_received.connect(_on_snapshot)
 	JPNet.peer_joined.connect(_on_peer_joined)
 	JPNet.peer_left.connect(_on_peer_left)
-	
-	# if we're a client and already connected, spawn self
+	JPNet.world_received.connect(_on_world_received)
 
 func _spawn_local_player() -> void:
 	var p = player_scene.instantiate()
@@ -57,3 +58,16 @@ func _on_snapshot(state: Dictionary) -> void:
 			node.global_position = node.global_position.lerp(pos, 0.8)
 		else:
 			node.global_position = node.global_position.lerp(pos, 0.8)
+
+func _on_world_received(map_data: Dictionary) -> void:
+	var w = map_data["w"]
+	var h = map_data["h"]
+	var map = map_data["map"]
+	
+	for x in range(w):
+		for y in range(h):
+			var v = map[x][y]
+			if v == 1:
+				tilemap.set_cell(Vector2i(x, y), 0, Vector2i(1, 0)) # wall
+			if v == 0:
+				tilemap.set_cell(Vector2i(x, y), 0, Vector2i(0, 0)) # floor

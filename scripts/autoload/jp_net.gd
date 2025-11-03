@@ -27,8 +27,11 @@ signal connected_to_server
 signal connection_failed
 signal server_disconnected
 
+
 signal peer_joined(peer_id: int, data: Dictionary)
 signal peer_left(peer_id: int)
+
+signal world_received(map_data: Dictionary)
 
 # Signal fires on every server snapshot.
 signal snapshot_received(state: Dictionary)
@@ -45,6 +48,8 @@ func _ready() -> void:
 # ========================
 # ===== START / STOP =====
 # ========================
+
+var world : ServerWorld
 func start_server(port: int = DEFAULT_PORT, max_clients: int = DEFAULT_MAX_CLIENTS):
 	var peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 	var err := peer.create_server(port, max_clients)
@@ -61,6 +66,8 @@ func start_server(port: int = DEFAULT_PORT, max_clients: int = DEFAULT_MAX_CLIEN
 	
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	world = ServerWorld.new()
+	
 
 func start_client(host: String, port: int):
 	var peer := ENetMultiplayerPeer.new()
@@ -104,6 +111,11 @@ func _on_server_disconnected() -> void:
 func _on_peer_connected(id: int) -> void:
 	if not is_server:
 		return
+	
+	# Map Sharing
+	if world != null:
+		rpc_id(id, "s2c_world", world.world_data)
+	
 	# initialize the player on the server
 	server_players[id] = {
 		"pos": Vector2(200, 200),
@@ -222,6 +234,10 @@ func s2c_player_join(peer_id: int, data: Dictionary) -> void:
 	if is_server:
 		return
 	emit_signal("peer_joined", peer_id, data)
+
+@rpc("reliable")
+func s2c_world(world_data: Dictionary) -> void:
+	emit_signal("world_received", world_data)
 
 # SERVER -> CLIENTS (LEAVE)
 @rpc("reliable")
