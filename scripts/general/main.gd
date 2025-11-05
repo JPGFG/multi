@@ -4,6 +4,8 @@ extends Node2D
 var player_scene = preload("res://scenes/player.tscn")
 var player_nodes: Dictionary = {} # peer_id -> Node2D
 
+var map_created: bool = false
+
 @onready var tilemap = $TileMapLayer
 
 func _ready() -> void:
@@ -60,6 +62,10 @@ func _on_snapshot(state: Dictionary) -> void:
 			node.global_position = node.global_position.lerp(pos, 0.8)
 
 func _on_world_received(map_data: Dictionary) -> void:
+	# check for serverside, if I already have a map, don't make a new one!
+	if map_created:
+		return
+
 	var w = map_data["w"]
 	var h = map_data["h"]
 	var map = map_data["map"]
@@ -71,3 +77,5 @@ func _on_world_received(map_data: Dictionary) -> void:
 				tilemap.set_cell(Vector2i(x, y), 0, Vector2i(1, 0)) # wall
 			if v == 0:
 				tilemap.set_cell(Vector2i(x, y), 0, Vector2i(0, 0)) # floor
+	
+	map_created = true

@@ -49,7 +49,7 @@ func _ready() -> void:
 # ===== START / STOP =====
 # ========================
 
-var world : ServerWorld
+var world : WorldData
 func start_server(port: int = DEFAULT_PORT, max_clients: int = DEFAULT_MAX_CLIENTS):
 	var peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 	var err := peer.create_server(port, max_clients)
@@ -66,7 +66,7 @@ func start_server(port: int = DEFAULT_PORT, max_clients: int = DEFAULT_MAX_CLIEN
 	
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
-	world = ServerWorld.new()
+	world = WorldData.new()
 	
 
 func start_client(host: String, port: int):

@@ -1,4 +1,4 @@
-class_name ServerWorld
+class_name WorldData
 extends RefCounted
 
 var world_data = {}
