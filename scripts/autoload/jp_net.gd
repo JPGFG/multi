@@ -13,12 +13,10 @@ const SNAPSHOT_VERSION : int = 1
 var is_server: bool = false
 var client_connected: bool = false
 
-# SERVER-side dict (peer_id -> {pos: Vector2, input: Vector2})
-var server_players: Dictionary = {}
-
 # CLIENT-side peer_id -> Node / data is handled by whoever listens to the signals
 # NO dictionary is stored here, just on the clients
 # We set up the following signals in order to handle this logic.
+
 
 # ===================
 # ===== SIGNALS =====
@@ -40,16 +38,19 @@ func _ready() -> void:
 	# allow boot from CLI
 	var args = OS.get_cmdline_args()
 	if "--server" in args:
-		start_server()
+		call_deferred("start_server")
 	else:
 		# default to load a client (non-headless)
-		start_client(DEFAULT_HOST, DEFAULT_PORT)
+		call_deferred("start_client", DEFAULT_HOST, DEFAULT_PORT)
 
 # ========================
 # ===== START / STOP =====
 # ========================
 
+# physics implementation data
 var world : WorldData
+var server_world: ServerWorld
+
 func start_server(port: int = DEFAULT_PORT, max_clients: int = DEFAULT_MAX_CLIENTS):
 	var peer: ENetMultiplayerPeer = ENetMultiplayerPeer.new()
 	var err := peer.create_server(port, max_clients)
@@ -66,7 +67,14 @@ func start_server(port: int = DEFAULT_PORT, max_clients: int = DEFAULT_MAX_CLIEN
 	
 	multiplayer.peer_connected.connect(_on_peer_connected)
 	multiplayer.peer_disconnected.connect(_on_peer_disconnected)
+	
+	# new server side physics rendering
 	world = WorldData.new()
+	server_world = ServerWorld.new()
+	get_tree().root.call_deferred("add_child", server_world)
+	
+	# build the server tilemap
+	server_world.call_deferred("build_server_map", world)
 	
 
 func start_client(host: String, port: int):
@@ -112,35 +120,35 @@ func _on_peer_connected(id: int) -> void:
 	if not is_server:
 		return
 	
-	# Map Sharing
+	# send world data to this client
 	if world != null:
 		rpc_id(id, "s2c_world", world.world_data)
 	
-	# initialize the player on the server
-	server_players[id] = {
-		"pos": Vector2(200, 200),
-		"input": Vector2.ZERO,
-	}
+	# choose a spawn position (stub)
+	var spawn_pos := Vector2(200, 200)
+	# register physics body on server
+	server_world.register_player(id, spawn_pos)
 	
-	print("Net: peer joined: ", id)
+	print("Net: peer joined ", id)
 	
-	for existing_id in server_players.keys():
-		var data := {"pos": server_players[existing_id]["pos"]}
+	# tell the new client about all existing players
+	for existing_id in server_world.server_players.keys():
+		var body = server_world.server_players[existing_id]
+		var data := {"pos": body.global_position}
 		rpc_id(id, "s2c_player_join", existing_id, data)
-	# Tell all clients that someone joined - made reliable for clients to spawn proxies during load-in
 	
-	rpc("s2c_player_join", id, {"pos": server_players[id]["pos"]})
-	# Also emit locally for any server-side UI
-	emit_signal("peer_joined", id, server_players[id])
+	# tell every client that this new player joined
+	rpc("s2c_player_join", id, {"pos": spawn_pos})
+	emit_signal("peer_joined", id, {"pos": spawn_pos})
+	
 
 func _on_peer_disconnected(id: int) -> void:
 	if not is_server:
 		return
 	
 	print("Net: peer left: ", id)
-	server_players.erase(id)
+	server_world.unregister_player(id)
 	
-	# tell all clients that a player left
 	rpc("s2c_player_leave", id)
 	emit_signal("peer_left", id)
 
@@ -172,30 +180,20 @@ const SNAPSHOT_DT := 0.05 # 20 HZ
 func _physics_process(delta: float) -> void:
 	if not is_server:
 		return
+	if not server_world:
+		return
 	
-	# simulate every frame
-	for id in server_players.keys():
-		var p = server_players[id]
-		var dir: Vector2 = p["input"]
-		if dir.length() > 1.0:
-			dir = dir.normalized()
-		p["pos"] += dir * 400 * delta #TODO fix this and make it into a serializable movespeed, possiblity for buffs etc.
-		server_players[id] = p
+	# run physics sim for server players
+	server_world.tick(delta)
 	
 	_accum += delta
 	if _accum >= SNAPSHOT_DT:
-		_broadcast_snapshot()
+		var snapshot: Dictionary = {
+			"v": SNAPSHOT_VERSION,
+			"players": server_world.build_snapshot()
+		}
+		rpc("s2c_state", snapshot)
 		_accum = 0.0
-
-func _broadcast_snapshot() -> void:
-	var snapshot: Dictionary = {
-		"v" : SNAPSHOT_VERSION,
-		"players": {}
-	}
-	for id in server_players.keys():
-		snapshot["players"][id] = server_players[id]["pos"]
-	
-	rpc("s2c_state", snapshot)
 
 # ==============
 # ==== RPCs ====
@@ -207,13 +205,11 @@ func c2s_input(dir: Vector2) -> void:
 	if not is_server:
 		return
 	var from_id := multiplayer.get_remote_sender_id()
-	if not server_players.has(from_id):
+	if not server_world or not server_world.server_players.has(from_id):
 		push_warning("Net: got input from unknown peer %s" % from_id)
 		return
-	# clamp to avoid dumb clients
-	if dir.length() > 1.0:
-		dir = dir.normalized()
-	server_players[from_id]["input"] = dir
+	server_world.process_input(from_id, dir)
+
 
 # SERVER -> CLIENTS (state snapshot)
 @rpc("unreliable")

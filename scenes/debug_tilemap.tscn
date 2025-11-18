@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://5jsc3yralnno"]
+
+[ext_resource type="TileSet" uid="uid://cq2rhudiejp2y" path="res://assets/tilemaps/tilesets/debug-tileset.tres" id="1_6gvx3"]
+
+[node name="TileMapLayer" type="TileMapLayer"]
+tile_set = ExtResource("1_6gvx3")
+rendering_quadrant_size = 32
