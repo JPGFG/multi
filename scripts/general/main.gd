@@ -45,22 +45,16 @@ func _on_peer_left(peer_id: int) -> void:
 func _on_snapshot(state: Dictionary) -> void:
 	var players: Dictionary = state.get("players", {})
 	for peer_id in players.keys():
-		var pos: Vector2 = players[peer_id]
+		var pdata = players[peer_id]
+		# allow both old Vector2 and new {pos, vel} during transition
+		var pos: Vector2 = pdata["pos"] if (pdata is Dictionary) else pdata
 		
 		if not player_nodes.has(peer_id):
-			# late join case: spawn
-			var p:= player_scene.instantiate()
-			p.name = "Player_%s" % peer_id
-			add_child(p)
-			player_nodes[peer_id] = p
+			_on_peer_joined(peer_id, {"pos": pos})
 		
 		var node: Node2D = player_nodes[peer_id]
-		# simple smoothing
-		if peer_id == multiplayer.get_unique_id():
-			node.global_position = node.global_position.lerp(pos, 0.8)
-		else:
-			node.global_position = node.global_position.lerp(pos, 0.8)
-
+		node.global_position = node.global_position.lerp(pos, 0.8)
+	
 func _on_world_received(map_data: Dictionary) -> void:
 	# check for serverside, if I already have a map, don't make a new one!
 	if map_created:
