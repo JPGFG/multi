@@ -14,6 +14,7 @@ func tick(delta: float) -> void:
 	for body in server_players.values():
 		body.move_and_slide()
 
+
 func process_input(sending_id: int, input: Vector2) -> void:
 	if not server_players.has(sending_id):
 		return

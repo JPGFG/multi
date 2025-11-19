@@ -38,6 +38,7 @@ func _ready() -> void:
 	# allow boot from CLI
 	var args = OS.get_cmdline_args()
 	if "--server" in args:
+		is_server = true
 		call_deferred("start_server")
 	else:
 		# default to load a client (non-headless)
@@ -60,7 +61,6 @@ func start_server(port: int = DEFAULT_PORT, max_clients: int = DEFAULT_MAX_CLIEN
 		return
 	
 	multiplayer.multiplayer_peer = peer
-	is_server = true
 	client_connected = true
 	
 	print("Net: SERVER listening on %d" % port)
@@ -128,6 +128,7 @@ func _on_peer_connected(id: int) -> void:
 	var spawn_pos := Vector2(200, 200)
 	# register physics body on server
 	server_world.register_player(id, spawn_pos)
+	
 	
 	print("Net: peer joined ", id)
 	

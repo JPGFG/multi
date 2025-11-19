@@ -9,6 +9,9 @@ var map_created: bool = false
 @onready var tilemap = $TileMapLayer
 
 func _ready() -> void:
+	# dont listen to these signals if you are the server
+	if JPNet.is_server:
+		return
 	# listen to network events
 	JPNet.snapshot_received.connect(_on_snapshot)
 	JPNet.peer_joined.connect(_on_peer_joined)
