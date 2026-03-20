@@ -35,6 +35,7 @@ func _on_peer_joined(peer_id: int, data: Dictionary) -> void:
 	add_child(p)
 	player_nodes[peer_id] = p
 	
+	## unique client side dependencies set here.
 	if peer_id == multiplayer.get_unique_id():
 		var player = p as Player
 		player.playercam.make_current()
