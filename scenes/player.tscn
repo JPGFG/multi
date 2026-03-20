@@ -1,17 +1,19 @@
-[gd_scene load_steps=4 format=3 uid="uid://ciu72irhq0o78"]
+[gd_scene format=3 uid="uid://ciu72irhq0o78"]
 
-[ext_resource type="Texture2D" uid="uid://xaxnrmav1c0n" path="res://assets/Sharable.png" id="1_3vyb7"]
 [ext_resource type="Script" uid="uid://b0c8kfwtjwj84" path="res://scripts/player/player.gd" id="1_g2els"]
+[ext_resource type="Texture2D" uid="uid://cnjcuuodsy2my" path="res://assets/sprites/temp_player_sprite.png" id="2_g2els"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
-size = Vector2(35, 97)
+size = Vector2(16, 16)
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" unique_id=1466087259]
 script = ExtResource("1_g2els")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-texture = ExtResource("1_3vyb7")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=639223075]
+texture = ExtResource("2_g2els")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, -4.5)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2005416535]
+position = Vector2(-0.5, 0)
 shape = SubResource("RectangleShape2D_g2els")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=661156166]

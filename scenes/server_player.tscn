@@ -1,11 +1,10 @@
-[gd_scene load_steps=2 format=3 uid="uid://cwql6omjb4cig"]
+[gd_scene format=3 uid="uid://cwql6omjb4cig"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
-size = Vector2(35, 97)
+size = Vector2(16, 16)
 
-[node name="ServerPlayer" type="CharacterBody2D"]
+[node name="ServerPlayer" type="CharacterBody2D" unique_id=159535516]
 collision_layer = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(-0.5, -4.5)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1530641543]
 shape = SubResource("RectangleShape2D_g2els")

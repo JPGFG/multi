@@ -36,8 +36,8 @@ func _on_peer_joined(peer_id: int, data: Dictionary) -> void:
 	player_nodes[peer_id] = p
 	
 	if peer_id == multiplayer.get_unique_id():
-		# eg add child camera etc TODO
-		pass
+		var player = p as Player
+		player.playercam.make_current()
 
 func _on_peer_left(peer_id: int) -> void:
 	if player_nodes.has(peer_id):

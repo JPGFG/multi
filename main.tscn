@@ -1,10 +1,10 @@
-[gd_scene load_steps=3 format=3 uid="uid://dlrstj4tlpail"]
+[gd_scene format=3 uid="uid://dlrstj4tlpail"]
 
 [ext_resource type="Script" uid="uid://b7ff3rm2j113a" path="res://scripts/general/main.gd" id="1_ig7tw"]
 [ext_resource type="TileSet" uid="uid://cq2rhudiejp2y" path="res://assets/tilemaps/tilesets/debug-tileset.tres" id="2_0xm2m"]
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=1824702382]
 script = ExtResource("1_ig7tw")
 
-[node name="TileMapLayer" type="TileMapLayer" parent="."]
+[node name="TileMapLayer" type="TileMapLayer" parent="." unique_id=1771729385]
 tile_set = ExtResource("2_0xm2m")

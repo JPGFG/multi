@@ -1,4 +1,4 @@
-[gd_resource type="TileSet" load_steps=3 format=3 uid="uid://cq2rhudiejp2y"]
+[gd_resource type="TileSet" format=3 uid="uid://cq2rhudiejp2y"]
 
 [ext_resource type="Texture2D" uid="uid://dlydbmw3nomnj" path="res://assets/tilemaps/wall-tile-aseprite-spritesheet.png" id="1_42eoa"]
 

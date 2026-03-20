@@ -1,7 +1,7 @@
 class_name ServerWorld
 extends Node2D
 
-const MOVESPEED : float = 400.0
+const MOVESPEED : float = 80.0
 
 # prefab empty tilemap with proper tilesets added to atlas
 var _tile_map_scene : PackedScene = preload("res://scenes/debug_tilemap.tscn") 

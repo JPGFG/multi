@@ -125,7 +125,7 @@ func _on_peer_connected(id: int) -> void:
 		rpc_id(id, "s2c_world", world.world_data)
 	
 	# choose a spawn position (stub)
-	var spawn_pos := Vector2(200, 200)
+	var spawn_pos := Vector2(50, 50)
 	# register physics body on server
 	server_world.register_player(id, spawn_pos)
 	
