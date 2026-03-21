@@ -1,16 +1,16 @@
 class_name ServerWorld
 extends Node2D
 
-const MOVESPEED : float = 80.0
+const MOVESPEED: float = 80.0
 
 # prefab empty tilemap with proper tilesets added to atlas
-var _tile_map_scene : PackedScene = preload("res://scenes/debug_tilemap.tscn") 
+var _tile_map_scene: PackedScene = preload("res://scenes/debug_tilemap.tscn")
 
 
-var server_players : Dictionary = {} # id (int) -> CharacterBody2D
+var server_players: Dictionary = {} # id (int) -> CharacterBody2D
 var server_player_scene: PackedScene = preload("res://scenes/server_player.tscn") # same collision, no sprites prefab
 
-func tick(delta: float) -> void:
+func tick(_delta: float) -> void:
 	for body in server_players.values():
 		body.move_and_slide()
 
