@@ -20,3 +20,6 @@ func _physics_process(delta):
 	
 	if not multiplayer.is_server() and JPNet.can_send():
 		JPNet.send_input(input_dir)
+		
+func set_player_name(name: String):
+	$PlayerNameLabel.text = name

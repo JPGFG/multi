@@ -17,3 +17,13 @@ position = Vector2(-0.5, 0)
 shape = SubResource("RectangleShape2D_g2els")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=661156166]
+
+[node name="PlayerNameLabel" type="Label" parent="." unique_id=1780642303]
+texture_filter = 1
+offset_left = -27.0
+offset_top = -29.0
+offset_right = 27.0
+offset_bottom = -9.0
+theme_override_font_sizes/font_size = 14
+text = "Player 1"
+horizontal_alignment = 1

@@ -30,6 +30,8 @@ func _on_peer_joined(peer_id: int, data: Dictionary) -> void:
 	
 	var p := player_scene.instantiate()
 	p.name = "Player_%s" % peer_id
+	p.set_player_name(p.name)
+	
 	if data.has("pos"):
 		p.global_position = data["pos"]
 	add_child(p)
